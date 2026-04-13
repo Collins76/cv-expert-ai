@@ -192,7 +192,19 @@ const CVExpert = (() => {
     const mobileToggle = document.getElementById('mobileSidebarToggle');
     if (mobileToggle) {
       mobileToggle.addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('open');
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        sidebar.classList.toggle('open');
+        backdrop.classList.toggle('active', sidebar.classList.contains('open'));
+      });
+    }
+
+    // Sidebar backdrop click to close
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (backdrop) {
+      backdrop.addEventListener('click', () => {
+        document.getElementById('sidebar').classList.remove('open');
+        backdrop.classList.remove('active');
       });
     }
 
@@ -257,8 +269,9 @@ const CVExpert = (() => {
       }
     });
 
-    // Close mobile sidebar
+    // Close mobile sidebar + backdrop
     document.getElementById('sidebar')?.classList.remove('open');
+    document.getElementById('sidebarBackdrop')?.classList.remove('active');
 
     state.currentView = viewName;
   }
