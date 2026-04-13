@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV Expert AI - Intelligent Resume Analyzer & Builder</title>
+  <meta name="description" content="AI-Powered CV Expert - ATS Analyzer, Smart Resume Builder, and Career Optimizer">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F4CB;</text></svg>">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- App Styles -->
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- ========== PARTICLE BACKGROUND ========== -->
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- ========== LOADING SCREEN ========== -->
+  <div id="loadingScreen" class="loading-screen">
+    <div class="loading-content">
+      <div class="loading-logo">
+        <div class="logo-icon pulse-glow">
+          <i class="fas fa-robot"></i>
+        </div>
+        <h1 class="loading-title glitch" data-text="CV EXPERT AI">CV EXPERT AI</h1>
+        <p class="loading-subtitle typewriter">Initializing Artificial Intelligence...</p>
+      </div>
+      <div class="loading-bar">
+        <div class="loading-progress"></div>
+      </div>
+      <div class="loading-stats">
+        <span id="loadingPercent">0%</span>
+        <span id="loadingStatus">Loading neural networks...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MAIN APP WRAPPER ========== -->
+  <div id="app" class="app-wrapper hidden">
+
+    <!-- ===== SIDEBAR NAVIGATION ===== -->
+    <nav id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-container">
+          <div class="logo-icon-small pulse-glow">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div class="logo-text">
+            <h2>CV Expert</h2>
+            <span class="logo-badge">AI</span>
+          </div>
+        </div>
+        <button id="sidebarToggle" class="sidebar-toggle" aria-label="Toggle sidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-menu">
+        <div class="menu-section">
+          <span class="menu-label">MAIN</span>
+          <a href="#" class="menu-item active" data-view="dashboard">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+            <div class="menu-indicator"></div>
+          </a>
+          <a href="#" class="menu-item" data-view="analyzer">
+            <i class="fas fa-search-plus"></i>
+            <span>CV Analyzer</span>
+          </a>
+          <a href="#" class="menu-item" data-view="builder">
+            <i class="fas fa-magic"></i>
+            <span>CV Builder</span>
+            <span class="menu-badge">NEW</span>
+          </a>
+          <a href="#" class="menu-item" data-view="ats-score">
+            <i class="fas fa-chart-bar"></i>
+            <span>ATS Score</span>
+          </a>
+        </div>
+
+        <div class="menu-section">
+          <span class="menu-label">AI TOOLS</span>
+          <a href="#" class="menu-item" data-view="job-match">
+            <i class="fas fa-crosshairs"></i>
+            <span>Job Match</span>
+          </a>
+          <a href="#" class="menu-item" data-view="optimizer">
+            <i class="fas fa-bolt"></i>
+            <span>AI Optimizer</span>
+          </a>
+          <a href="#" class="menu-item" data-view="keywords">
+            <i class="fas fa-key"></i>
+            <span>Keywords</span>
+          </a>
+          <a href="#" class="menu-item" data-view="interview">
+            <i class="fas fa-microphone"></i>
+            <span>Interview Prep</span>
+          </a>
+        </div>
+
+        <div class="menu-section">
+          <span class="menu-label">MORE</span>
+          <a href="#" class="menu-item" data-view="templates">
+            <i class="fas fa-layer-group"></i>
+            <span>Templates</span>
+          </a>
+          <a href="#" class="menu-item" data-view="history">
+            <i class="fas fa-history"></i>
+            <span>History</span>
+          </a>
+          <a href="#" class="menu-item" data-view="settings">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="user-avatar gradient-border">
+            <span>CA</span>
+          </div>
+          <div class="user-info">
+            <span class="user-name">Collins Anyanwu</span>
+            <span class="user-plan">Pro Plan <i class="fas fa-crown"></i></span>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main id="mainContent" class="main-content">
+
+      <!-- TOP HEADER BAR -->
+      <header class="top-header">
+        <div class="header-left">
+          <button id="mobileSidebarToggle" class="mobile-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" id="globalSearch" placeholder="Search anything... (Ctrl+K)" autocomplete="off">
+            <kbd>Ctrl+K</kbd>
+          </div>
+        </div>
+        <div class="header-right">
+          <button class="header-btn" id="aiAssistantBtn" title="AI Assistant">
+            <i class="fas fa-robot"></i>
+            <span class="notification-dot"></span>
+          </button>
+          <button class="header-btn" id="notificationsBtn" title="Notifications">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <button class="header-btn" id="themeToggle" title="Toggle theme">
+            <i class="fas fa-moon"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- ===== VIEW: DASHBOARD ===== -->
+      <section id="view-dashboard" class="view active fade-in">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">Welcome back, <span class="gradient-text">Collins</span></h1>
+            <p class="view-subtitle">Your AI-powered career command center</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn btn-primary glow-btn" onclick="CVExpert.navigate('analyzer')">
+              <i class="fas fa-upload"></i> Analyze CV
+            </button>
+            <button class="btn btn-secondary" onclick="CVExpert.navigate('builder')">
+              <i class="fas fa-plus"></i> Build New CV
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card glass-card animate-in" style="--delay: 0.1s">
+            <div class="stat-icon" style="--accent: #00d4ff">
+              <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="stat-info">
+              <h3 class="stat-number counter" data-target="47">0</h3>
+              <p>CVs Analyzed</p>
+            </div>
+            <div class="stat-trend up">
+              <i class="fas fa-arrow-up"></i> 12%
+            </div>
+          </div>
+          <div class="stat-card glass-card animate-in" style="--delay: 0.2s">
+            <div class="stat-icon" style="--accent: #00ff88">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-info">
+              <h3 class="stat-number counter" data-target="89">0</h3>
+              <p>Avg ATS Score</p>
+            </div>
+            <div class="stat-trend up">
+              <i class="fas fa-arrow-up"></i> 8%
+            </div>
+          </div>
+          <div class="stat-card glass-card animate-in" style="--delay: 0.3s">
+            <div class="stat-icon" style="--accent: #ff6b35">
+              <i class="fas fa-bullseye"></i>
+            </div>
+            <div class="stat-info">
+              <h3 class="stat-number counter" data-target="156">0</h3>
+              <p>Keywords Found</p>
+            </div>
+            <div class="stat-trend up">
+              <i class="fas fa-arrow-up"></i> 23%
+            </div>
+          </div>
+          <div class="stat-card glass-card animate-in" style="--delay: 0.4s">
+            <div class="stat-icon" style="--accent: #a855f7">
+              <i class="fas fa-trophy"></i>
+            </div>
+            <div class="stat-info">
+              <h3 class="stat-number counter" data-target="12">0</h3>
+              <p>Optimized CVs</p>
+            </div>
+            <div class="stat-trend up">
+              <i class="fas fa-arrow-up"></i> 5%
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+          <!-- Recent Analysis -->
+          <div class="dashboard-card glass-card animate-in" style="--delay: 0.5s">
+            <div class="card-header">
+              <h3><i class="fas fa-clock"></i> Recent Analysis</h3>
+              <button class="btn btn-ghost btn-sm">View All</button>
+            </div>
+            <div class="card-body">
+              <div class="activity-list" id="recentAnalysis">
+                <div class="activity-item">
+                  <div class="activity-icon success"><i class="fas fa-check"></i></div>
+                  <div class="activity-info">
+                    <span class="activity-title">Senior GIS Developer CV</span>
+                    <span class="activity-meta">ATS Score: 92/100 - 2 hours ago</span>
+                  </div>
+                  <span class="activity-score high">92</span>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon warning"><i class="fas fa-exclamation"></i></div>
+                  <div class="activity-info">
+                    <span class="activity-title">Full-Stack Developer CV</span>
+                    <span class="activity-meta">ATS Score: 74/100 - Yesterday</span>
+                  </div>
+                  <span class="activity-score medium">74</span>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon success"><i class="fas fa-check"></i></div>
+                  <div class="activity-info">
+                    <span class="activity-title">Data Analyst Resume</span>
+                    <span class="activity-meta">ATS Score: 88/100 - 3 days ago</span>
+                  </div>
+                  <span class="activity-score high">88</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="dashboard-card glass-card animate-in" style="--delay: 0.6s">
+            <div class="card-header">
+              <h3><i class="fas fa-rocket"></i> Quick Actions</h3>
+            </div>
+            <div class="card-body">
+              <div class="quick-actions-grid">
+                <button class="quick-action-btn" onclick="CVExpert.navigate('analyzer')">
+                  <div class="qa-icon"><i class="fas fa-upload"></i></div>
+                  <span>Upload CV</span>
+                </button>
+                <button class="quick-action-btn" onclick="CVExpert.navigate('builder')">
+                  <div class="qa-icon"><i class="fas fa-pen-fancy"></i></div>
+                  <span>Create CV</span>
+                </button>
+                <button class="quick-action-btn" onclick="CVExpert.navigate('job-match')">
+                  <div class="qa-icon"><i class="fas fa-handshake"></i></div>
+                  <span>Job Match</span>
+                </button>
+                <button class="quick-action-btn" onclick="CVExpert.navigate('optimizer')">
+                  <div class="qa-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+                  <span>Optimize</span>
+                </button>
+                <button class="quick-action-btn" onclick="CVExpert.navigate('interview')">
+                  <div class="qa-icon"><i class="fas fa-comments"></i></div>
+                  <span>Interview</span>
+                </button>
+                <button class="quick-action-btn" onclick="CVExpert.navigate('templates')">
+                  <div class="qa-icon"><i class="fas fa-palette"></i></div>
+                  <span>Templates</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ATS Score Gauge -->
+          <div class="dashboard-card glass-card animate-in" style="--delay: 0.7s">
+            <div class="card-header">
+              <h3><i class="fas fa-gauge-high"></i> Latest ATS Score</h3>
+            </div>
+            <div class="card-body center-content">
+              <div class="score-gauge" id="dashboardGauge">
+                <svg viewBox="0 0 200 200" class="gauge-svg">
+                  <circle cx="100" cy="100" r="85" class="gauge-bg"/>
+                  <circle cx="100" cy="100" r="85" class="gauge-fill" id="dashGaugeFill"
+                    stroke-dasharray="534" stroke-dashoffset="534"/>
+                  <text x="100" y="90" class="gauge-value" id="dashGaugeValue">0</text>
+                  <text x="100" y="115" class="gauge-label">ATS Score</text>
+                </svg>
+              </div>
+              <div class="gauge-legend">
+                <span class="legend-item"><span class="dot high"></span> Excellent (80+)</span>
+                <span class="legend-item"><span class="dot medium"></span> Good (60-79)</span>
+                <span class="legend-item"><span class="dot low"></span> Needs Work (&lt;60)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Insights -->
+          <div class="dashboard-card glass-card animate-in" style="--delay: 0.8s">
+            <div class="card-header">
+              <h3><i class="fas fa-brain"></i> AI Insights</h3>
+              <span class="live-badge"><span class="pulse-dot"></span> Live</span>
+            </div>
+            <div class="card-body">
+              <div class="insights-list" id="aiInsights">
+                <div class="insight-item">
+                  <i class="fas fa-lightbulb insight-icon tip"></i>
+                  <p>Your CV lacks quantifiable achievements. Add metrics to boost your ATS score by up to 15%.</p>
+                </div>
+                <div class="insight-item">
+                  <i class="fas fa-exclamation-triangle insight-icon warning"></i>
+                  <p>Missing industry keywords: "agile", "CI/CD", "cloud architecture". These appear in 78% of target job listings.</p>
+                </div>
+                <div class="insight-item">
+                  <i class="fas fa-star insight-icon success"></i>
+                  <p>Your GIS expertise section is exceptionally strong. It matches 94% of related job requirements.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: CV ANALYZER ===== -->
+      <section id="view-analyzer" class="view fade-in">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title"><i class="fas fa-search-plus"></i> CV <span class="gradient-text">Analyzer</span></h1>
+            <p class="view-subtitle">AI-powered deep analysis of your resume</p>
+          </div>
+        </div>
+
+        <div class="analyzer-layout">
+          <!-- Upload Zone -->
+          <div class="upload-section glass-card">
+            <div id="uploadZone" class="upload-zone">
+              <div class="upload-icon bounce-in">
+                <i class="fas fa-cloud-upload-alt"></i>
+              </div>
+              <h3>Drop your CV here</h3>
+              <p>or click to browse files</p>
+              <p class="upload-formats">Supports: PDF, DOCX, TXT (Max 10MB)</p>
+              <input type="file" id="cvFileInput" accept=".pdf,.docx,.doc,.txt" hidden>
+              <button class="btn btn-primary glow-btn" onclick="document.getElementById('cvFileInput').click()">
+                <i class="fas fa-folder-open"></i> Browse Files
+              </button>
+            </div>
+            <div id="uploadProgress" class="upload-progress hidden">
+              <div class="file-info">
+                <i class="fas fa-file-pdf"></i>
+                <span id="uploadFileName">document.pdf</span>
+                <span id="uploadFileSize">2.4 MB</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="uploadProgressBar"></div>
+              </div>
+              <span id="uploadPercent">0%</span>
+            </div>
+          </div>
+
+          <!-- OR: Paste Text -->
+          <div class="divider-or">
+            <span>OR</span>
+          </div>
+
+          <div class="paste-section glass-card">
+            <h3><i class="fas fa-paste"></i> Paste CV Content</h3>
+            <textarea id="cvTextInput" class="cv-textarea" placeholder="Paste your CV/Resume text content here...&#10;&#10;The AI will analyze your content for:&#10;- ATS compatibility&#10;- Keyword optimization&#10;- Format quality&#10;- Section completeness&#10;- Action verb usage&#10;- Quantifiable achievements"></textarea>
+            <div class="paste-actions">
+              <button class="btn btn-primary glow-btn" onclick="CVExpert.analyzeCV()">
+                <i class="fas fa-brain"></i> Analyze with AI
+              </button>
+              <button class="btn btn-secondary" onclick="CVExpert.loadSampleCV()">
+                <i class="fas fa-flask"></i> Load Sample
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analysis Results (hidden until analysis) -->
+        <div id="analysisResults" class="analysis-results hidden">
+          <div class="results-header">
+            <h2><i class="fas fa-poll"></i> Analysis Results</h2>
+            <div class="results-actions">
+              <button class="btn btn-secondary btn-sm" onclick="CVExpert.exportReport()">
+                <i class="fas fa-download"></i> Export Report
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="CVExpert.navigate('optimizer')">
+                <i class="fas fa-bolt"></i> Optimize Now
+              </button>
+            </div>
+          </div>
+
+          <!-- Score Overview -->
+          <div class="scores-grid">
+            <div class="score-card glass-card">
+              <div class="mini-gauge" id="overallScoreGauge">
+                <svg viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="50" class="gauge-bg"/>
+                  <circle cx="60" cy="60" r="50" class="gauge-fill" stroke-dasharray="314" stroke-dashoffset="314"/>
+                  <text x="60" y="55" class="gauge-value-sm">0</text>
+                  <text x="60" y="72" class="gauge-label-sm">Overall</text>
+                </svg>
+              </div>
+              <span class="score-title">Overall Score</span>
+            </div>
+            <div class="score-card glass-card">
+              <div class="mini-gauge" id="atsScoreGauge">
+                <svg viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="50" class="gauge-bg"/>
+                  <circle cx="60" cy="60" r="50" class="gauge-fill" stroke-dasharray="314" stroke-dashoffset="314"/>
+                  <text x="60" y="55" class="gauge-value-sm">0</text>
+                  <text x="60" y="72" class="gauge-label-sm">ATS</text>
+                </svg>
+              </div>
+              <span class="score-title">ATS Compatibility</span>
+            </div>
+            <div class="score-card glass-card">
+              <div class="mini-gauge" id="formatScoreGauge">
+                <svg viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="50" class="gauge-bg"/>
+                  <circle cx="60" cy="60" r="50" class="gauge-fill" stroke-dasharray="314" stroke-dashoffset="314"/>
+                  <text x="60" y="55" class="gauge-value-sm">0</text>
+                  <text x="60" y="72" class="gauge-label-sm">Format</text>
+                </svg>
+              </div>
+              <span class="score-title">Format Quality</span>
+            </div>
+            <div class="score-card glass-card">
+              <div class="mini-gauge" id="contentScoreGauge">
+                <svg viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="50" class="gauge-bg"/>
+                  <circle cx="60" cy="60" r="50" class="gauge-fill" stroke-dasharray="314" stroke-dashoffset="314"/>
+                  <text x="60" y="55" class="gauge-value-sm">0</text>
+                  <text x="60" y="72" class="gauge-label-sm">Content</text>
+                </svg>
+              </div>
+              <span class="score-title">Content Strength</span>
+            </div>
+            <div class="score-card glass-card">
+              <div class="mini-gauge" id="impactScoreGauge">
+                <svg viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="50" class="gauge-bg"/>
+                  <circle cx="60" cy="60" r="50" class="gauge-fill" stroke-dasharray="314" stroke-dashoffset="314"/>
+                  <text x="60" y="55" class="gauge-value-sm">0</text>
+                  <text x="60" y="72" class="gauge-label-sm">Impact</text>
+                </svg>
+              </div>
+              <span class="score-title">Impact Level</span>
+            </div>
+          </div>
+
+          <!-- Detailed Analysis -->
+          <div class="analysis-grid">
+            <div class="analysis-card glass-card">
+              <h3><i class="fas fa-check-circle"></i> Sections Found</h3>
+              <div id="sectionsFound" class="checklist"></div>
+            </div>
+            <div class="analysis-card glass-card">
+              <h3><i class="fas fa-key"></i> Keywords Detected</h3>
+              <div id="keywordsDetected" class="tags-cloud"></div>
+            </div>
+            <div class="analysis-card glass-card">
+              <h3><i class="fas fa-running"></i> Action Verbs</h3>
+              <div id="actionVerbs" class="tags-cloud"></div>
+            </div>
+            <div class="analysis-card glass-card">
+              <h3><i class="fas fa-lightbulb"></i> AI Recommendations</h3>
+              <div id="aiRecommendations" class="recommendations-list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: CV BUILDER ===== -->
+      <section id="view-builder" class="view fade-in">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title"><i class="fas fa-magic"></i> CV <span class="gradient-text">Builder</span></h1>
+            <p class="view-subtitle">Create a professional, ATS-optimized resume in minutes</p>
+          </div>
+        </div>
+
+        <!-- Builder Steps -->
+        <div class="builder-steps">
+          <div class="step active" data-step="1">
+            <div class="step-number">1</div>
+            <span>Personal</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="2">
+            <div class="step-number">2</div>
+            <span>Experience</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="3">
+            <div class="step-number">3</div>
+            <span>Education</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="4">
+            <div class="step-number">4</div>
+            <span>Skills</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="5">
+            <div class="step-number">5</div>
+            <span>Preview</span>
+          </div>
+        </div>
+
+        <!-- Builder Forms -->
+        <div class="builder-content">
+          <!-- Step 1: Personal Info -->
+          <div id="builderStep1" class="builder-step active glass-card">
+            <h3><i class="fas fa-user"></i> Personal Information</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Full Name *</label>
+                <input type="text" id="bFullName" placeholder="e.g. Collins Anyanwu" class="form-input">
+              </div>
+              <div class="form-group">
+                <label>Professional Title *</label>
+                <input type="text" id="bTitle" placeholder="e.g. Senior GIS Developer" class="form-input">
+                <div class="ai-suggest" id="titleSuggestions"></div>
+              </div>
+              <div class="form-group">
+                <label>Email *</label>
+                <input type="email" id="bEmail" placeholder="your@email.com" class="form-input">
+              </div>
+              <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" id="bPhone" placeholder="+234 xxx xxxx" class="form-input">
+              </div>
+              <div class="form-group">
+                <label>Location</label>
+                <input type="text" id="bLocation" placeholder="Lagos, Nigeria" class="form-input">
+              </div>
+              <div class="form-group">
+                <label>LinkedIn</label>
+                <input type="url" id="bLinkedIn" placeholder="linkedin.com/in/yourprofile" class="form-input">
+              </div>
+              <div class="form-group full-width">
+                <label>Professional Summary *</label>
+                <textarea id="bSummary" class="form-input" rows="4" placeholder="Brief professional summary highlighting your expertise..."></textarea>
+                <button class="btn btn-ghost btn-sm ai-btn" onclick="CVExpert.Builder.generateSummary()">
+                  <i class="fas fa-wand-magic-sparkles"></i> AI Generate
+                </button>
+              </div>
+            </div>
+            <div class="step-nav">
+              <div></div>
+              <button class="btn btn-primary" onclick="CVExpert.Builder.nextStep()">
+                Next <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Experience -->
+          <div id="builderStep2" class="builder-step glass-card">
+            <h3><i class="fas fa-briefcase"></i> Work Experience</h3>
+            <div id="experienceList" class="dynamic-list"></div>
+            <button class="btn btn-secondary add-btn" onclick="CVExpert.Builder.addExperience()">
+              <i class="fas fa-plus"></i> Add Experience
+            </button>
+            <div class="step-nav">
+              <button class="btn btn-ghost" onclick="CVExpert.Builder.prevStep()">
+                <i class="fas fa-arrow-left"></i> Back
+              </button>
+              <button class="btn btn-primary" onclick="CVExpert.Builder.nextStep()">
+                Next <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Education -->
+          <div id="builderStep3" class="builder-step glass-card">
+            <h3><i class="fas fa-graduation-cap"></i> Education</h3>
+            <div id="educationList" class="dynamic-list"></div>
+            <button class="btn btn-secondary add-btn" onclick="CVExpert.Builder.addEducation()">
+              <i class="fas fa-plus"></i> Add Education
+            </button>
+            <div class="step-nav">
+              <button class="btn btn-ghost" onclick="CVExpert.Builder.prevStep()">
+                <i class="fas fa-arrow-left"></i> Back
+              </button>
+              <button class="btn btn-primary" onclick="CVExpert.Builder.nextStep()">
+                Next <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 4: Skills -->
+          <div id="builderStep4" class="builder-step glass-card">
+            <h3><i class="fas fa-tools"></i> Skills & Certifications</h3>
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label>Technical Skills</label>
+                <div id="technicalSkills" class="skill-tags-input">
+                  <input type="text" id="techSkillInput" placeholder="Type a skill and press Enter" class="form-input">
+                </div>
+                <button class="btn btn-ghost btn-sm ai-btn" onclick="CVExpert.Builder.suggestSkills('technical')">
+                  <i class="fas fa-wand-magic-sparkles"></i> AI Suggest Skills
+                </button>
+              </div>
+              <div class="form-group full-width">
+                <label>Soft Skills</label>
+                <div id="softSkills" class="skill-tags-input">
+                  <input type="text" id="softSkillInput" placeholder="Type a skill and press Enter" class="form-input">
+                </div>
+              </div>
+              <div class="form-group full-width">
+                <label>Certifications</label>
+                <div id="certificationsList" class="dynamic-list"></div>
+                <button class="btn btn-secondary add-btn" onclick="CVExpert.Builder.addCertification()">
+                  <i class="fas fa-plus"></i> Add Certification
+                </button>
+              </div>
+            </div>
+            <div class="step-nav">
+              <button class="btn btn-ghost" onclick="CVExpert.Builder.prevStep()">
+                <i class="fas fa-arrow-left"></i> Back
+              </button>
+              <button class="btn btn-primary" onclick="CVExpert.Builder.nextStep()">
+                Preview <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 5: Preview -->
+          <div id="builderStep5" class="builder-step glass-card">
+            <h3><i class="fas fa-eye"></i> CV Preview</h3>
+            <div class="preview-toolbar">
+              <select id="templateSelect" class="form-input" onchange="CVExpert.Builder.changeTemplate()">
+                <option value="modern">Modern Professional</option>
+                <option value="classic">Classic Elegant</option>
+                <option value="creative">Creative Bold</option>
+                <option value="minimal">Minimal Clean</option>
+                <option value="executive">Executive Premium</option>
+              </select>
+              <button class="btn btn-primary glow-btn" onclick="CVExpert.Builder.downloadCV()">
+                <i class="fas fa-download"></i> Download CV
+              </button>
+            </div>
+            <div id="cvPreview" class="cv-preview-container"></div>
+            <div class="step-nav">
+              <button class="btn btn-ghost" onclick="CVExpert.Builder.prevStep()">
+                <i class="fas fa-arrow-left"></i> Back
+              </button>
+              <button class="btn btn-primary glow-btn" onclick="CVExpert.Builder.downloadCV()">
+                <i class="fas fa-file-pdf"></i> Export as PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: ATS SCORE ===== -->
+      <section id="view-ats-score" class="view fade-in">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title"><i class="fas fa-chart-bar"></i> ATS <span class="gradient-text">Score</span></h1>
+            <p class="view-subtitle">Detailed Applicant Tracking System compatibility report</p>
+          </div>
+        </div>
+        <div class="ats-layout">
+          <div class="ats-main glass-card">
+            <div class="ats-big-gauge" id="atsBigGauge">
+              <svg viewBox="0 0 250 250" class="gauge-svg">
+                <circle cx="125" cy="125" r="105" class="gauge-bg"/>
+                <circle cx="125" cy="125" r="105" class="gauge-fill" stroke-dasharray="660" stroke-dashoffset="660"/>
+                <text x="125" y="115" class="gauge-value-lg">--</text>
+                <text x="125" y="145" class="gauge-label">ATS SCORE</text>
+              </svg>
+            </div>
+            <p class="ats-message" id="atsMessage">Upload or paste your CV in the Analyzer to see your ATS score</p>
+          </div>
+          <div class="ats-breakdown glass-card">
+            <h3><i class="fas fa-list-check"></i> Score Breakdown</h3>
+            <div id="atsBreakdown" class="breakdown-list">
+              <div class="breakdown-item">
+                <span class="breakdown-label">Keyword Match</span>
+                <div class="breakdown-bar"><div class="breakdown-fill" style="width:0%"></div></div>
+                <span class="breakdown-value">--%</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-label">Format Compliance</span>
+                <div class="breakdown-bar"><div class="breakdown-fill" style="width:0%"></div></div>
+                <span class="breakdown-value">--%</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-label">Section Structure</span>
+                <div class="breakdown-bar"><div class="breakdown-fill" style="width:0%"></div></div>
+                <span class="breakdown-value">--%</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-label">Content Quality</span>
+                <div class="breakdown-bar"><div class="breakdown-fill" style="width:0%"></div></div>
+                <span class="breakdown-value">--%</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-label">Action Verbs</span>
+                <div class="breakdown-bar"><div class="breakdown-fill" style="width:0%"></div></div>
+                <span class="breakdown-value">--%</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-label">Quantifiable Results</span>
+                <div class="breakdown-bar"><div class="breakdown-fill" style="width:0%"></div></div>
+                <span class="breakdown-value">--%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: JOB MATCH ===== -->
+      <section id="view-job-match" class="view fade-in">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title"><i class="fas fa-crosshairs"></i> Job <span class="gradient-text">Match</span></h1>
+            <p class="view-subtitle">Compare your CV against specific job descriptions</p>
+          </div>
+        </div>
+        <div class="job-match-layout">
+          <div class="match-input glass-card">
+            <h3><i class="fas fa-briefcase"></i> Job Description</h3>
+            <textarea id="jobDescription" class="cv-textarea" rows="8" placeholder="Paste the job description here...&#10;&#10;The AI will analyze compatibility between your CV and this position."></textarea>
+            <button class="btn btn-primary glow-btn" onclick="CVExpert.analyzeJobMatch()">
+              <i class="fas fa-crosshairs"></i> Analyze Match
+            </button>
+          </div>
+          <div id="matchResults" class="match-results hidden">
+            <div class="match-score-card glass-card">
+              <div class="match-percentage" id="matchPercentage">
+                <svg viewBox="0 0 150 150">
+                  <circle cx="75" cy="75" r="65" class="gauge-bg"/>
+                  <circle cx="75" cy="75" r="65" class="gauge-fill" stroke-dasharray="408" stroke-dashoffset="408"/>
+                  <text x="75" y="70" class="gauge-value-sm">0%</text>
+                  <text x="75" y="90" class="gauge-label-sm">Match</text>
+                </svg>
+              </div>
+            </div>
+            <div class="match-details glass-card">
+              <h3><i class="fas fa-check-double"></i> Matching Keywords</h3>
+              <div id="matchingKeywords" class="tags-cloud"></div>
+            </div>
+            <div class="match-details glass-card">
+              <h3><i class="fas fa-times-circle"></i> Missing Keywords</h3>
+              <div id="missingKeywords" class="tags-cloud missing"></div>
+            </div>
+            <div class="match-details glass-card">
+              <h3><i class="fas fa-lightbulb"></i> Suggestions</h3>
+              <div id="matchSuggestions" class="recommendations-list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: AI OPTIMIZER ===== -->
+      <section id="view-optimizer" class="view fade-in">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title"><i class="fas fa-bolt"></i> AI <span class="gradient-text">Optimizer</span></h1>
+            <p class="view-subtitle">Let AI supercharge your resume with smart optimizations</p>
+          </div>
+        </div>
+        <div class="optimizer-layout">
+          <div class="optimizer-input glass-card">
+            <h3><i class="fas fa-file-alt"></i> Your CV Content</h3>
+            <textarea id="optimizerInput" class="cv-textarea" rows="10" placeholder="Paste your CV content here for AI optimization..."></textarea>
+            <div class="optimizer-options">
+              <label class="checkbox-label">
+                <input type="checkbox" checked id="optATS"> <span>ATS Optimization</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" checked id="optKeywords"> <span>Keyword Enhancement</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" checked id="optVerbs"> <span>Action Verb Upgrade</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" checked id="optMetrics"> <span>Add Quantifiable Metrics</span>
+              </label>
+            </div>
+            <select id="targetIndustry" class="form-input">
+              <option value="">Select Target Industry...</option>
+              <option value="tech">Technology & IT</option>
+              <option value="finance">Finance & Banking</option>
+              <option value="healthcare">Healthcare</option>
+              <option value="engineering">Engineering</option>
+              <option value="marketing">Marketing & Sales</option>
+              <option value="gis">GIS & Geospatial</option>
+              <option value="energy">Energy & Utilities</option>
+              <option value="consulting">Consulting</option>
+            </select>
+            <button class="btn btn-primary glow-btn" onclick="CVExpert.optimizeCV()">
+              <i class="fas fa-rocket"></i> Optimize with AI
+            </button>
+          </div>
+          <div id="optimizerResults" class="optimizer-results hidden">
+            <div class="glass-card">
+              <div class="optimizer-header">
+                <h3><i class="fas fa-sparkles"></i> Optimized Content</h3>
+                <button class="btn btn-secondary btn-sm" onclick="CVExpert.copyOptimized()">
+                  <i class="fas fa-copy"></i> Copy
+                </button>
+              </div>
+              <div id="optimizedContent" class="optimized-content"></div>
+            </div>
+            <div class="glass-card">
+              <h3><i class="fas fa-exchange-alt"></i> Changes Made</h3>
+              <div id="changesList" class="changes-list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: KEYWORDS ===== -->
+      <section id="view-keywords" class="view fade-in">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title"><i class="fas fa-key"></i> Keyword <span class="gradient-text">Intelligence</span></h1>
+            <p class="view-subtitle">Industry-specific keyword analysis and recommendations</p>
+          </div>
+        </div>
+        <div class="keywords-layout">
+          <div class="glass-card">
+            <h3><i class="fas fa-industry"></i> Select Industry</h3>
+            <div class="industry-grid" id="industryGrid">
+              <button class="industry-btn active" data-industry="tech" onclick="CVExpert.selectIndustry('tech')">
+                <i class="fas fa-laptop-code"></i><span>Technology</span>
+              </button>
+              <button class="industry-btn" data-industry="gis" onclick="CVExpert.selectIndustry('gis')">
+                <i class="fas fa-globe-africa"></i><span>GIS & Geospatial</span>
+              </button>
+              <button class="industry-btn" data-industry="finance" onclick="CVExpert.selectIndustry('finance')">
+                <i class="fas fa-chart-pie"></i><span>Finance</span>
+              </button>
+              <button class="industry-btn" data-industry="engineering" onclick="CVExpert.selectIndustry('engineering')">
+                <i class="fas fa-cogs"></i><span>Engineering</span>
+              </button>
+              <button class="industry-btn" data-industry="healthcare" onclick="CVExpert.selectIndustry('healthcare')">
+                <i class="fas fa-heartbeat"></i><span>Healthcare</span>
+              </button>
+              <button class="industry-btn" data-industry="marketing" onclick="CVExpert.selectIndustry('marketing')">
+                <i class="fas fa-bullhorn"></i><span>Marketing</span>
+              </button>
+              <button class="industry-btn" data-industry="energy" onclick="CVExpert.selectIndustry('energy')">
+                <i class="fas fa-bolt"></i><span>Energy</span>
+              </button>
+              <button class="industry-btn" data-industry="data" onclick="CVExpert.selectIndustry('data')">
+                <i class="fas fa-database"></i><span>Data Science</span>
+              </button>
+            </div>
+          </div>
+          <div class="keywords-results">
+            <div class="glass-card">
+              <h3><i class="fas fa-fire"></i> Trending Keywords</h3>
+              <div id="trendingKeywords" class="tags-cloud"></div>
+            </div>
+            <div class="glass-card">
+              <h3><i class="fas fa-star"></i> Must-Have Keywords</h3>
+              <div id="mustHaveKeywords" class="tags-cloud"></div>
+            </div>
+            <div class="glass-card">
+              <h3><i class="fas fa-gem"></i> Bonus Keywords</h3>
+              <div id="bonusKeywords" class="tags-cloud bonus"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: INTERVIEW PREP ===== -->
+      <section id="view-interview" class="view fade-in">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title"><i class="fas fa-microphone"></i> Interview <span class="gradient-text">Prep</span></h1>
+            <p class="view-subtitle">AI-generated interview questions based on your CV</p>
+          </div>
+        </div>
+        <div class="interview-layout">
+          <div class="glass-card">
+            <h3><i class="fas fa-sliders-h"></i> Configuration</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Interview Type</label>
+                <select id="interviewType" class="form-input">
+                  <option value="behavioral">Behavioral</option>
+                  <option value="technical">Technical</option>
+                  <option value="situational">Situational</option>
+                  <option value="mixed">Mixed</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Difficulty</label>
+                <select id="interviewDifficulty" class="form-input">
+                  <option value="entry">Entry Level</option>
+                  <option value="mid">Mid Level</option>
+                  <option value="senior">Senior Level</option>
+                  <option value="executive">Executive</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary glow-btn" onclick="CVExpert.generateInterviewQuestions()">
+              <i class="fas fa-brain"></i> Generate Questions
+            </button>
+          </div>
+          <div id="interviewQuestions" class="interview-questions"></div>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: TEMPLATES ===== -->
+      <section id="view-templates" class="view fade-in">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title"><i class="fas fa-layer-group"></i> CV <span class="gradient-text">Templates</span></h1>
+            <p class="view-subtitle">Professional templates optimized for ATS systems</p>
+          </div>
+        </div>
+        <div class="templates-grid" id="templatesGrid">
+          <div class="template-card glass-card" data-template="modern">
+            <div class="template-preview modern-preview">
+              <div class="tp-header"></div>
+              <div class="tp-body">
+                <div class="tp-line w80"></div>
+                <div class="tp-line w60"></div>
+                <div class="tp-line w90"></div>
+                <div class="tp-line w40"></div>
+              </div>
+            </div>
+            <div class="template-info">
+              <h4>Modern Professional</h4>
+              <span class="template-ats">ATS Score: 95/100</span>
+              <button class="btn btn-primary btn-sm" onclick="CVExpert.useTemplate('modern')">Use Template</button>
+            </div>
+          </div>
+          <div class="template-card glass-card" data-template="classic">
+            <div class="template-preview classic-preview">
+              <div class="tp-header center"></div>
+              <div class="tp-body">
+                <div class="tp-line w90"></div>
+                <div class="tp-line w70"></div>
+                <div class="tp-line w85"></div>
+                <div class="tp-line w50"></div>
+              </div>
+            </div>
+            <div class="template-info">
+              <h4>Classic Elegant</h4>
+              <span class="template-ats">ATS Score: 98/100</span>
+              <button class="btn btn-primary btn-sm" onclick="CVExpert.useTemplate('classic')">Use Template</button>
+            </div>
+          </div>
+          <div class="template-card glass-card" data-template="creative">
+            <div class="template-preview creative-preview">
+              <div class="tp-sidebar"></div>
+              <div class="tp-body">
+                <div class="tp-line w80"></div>
+                <div class="tp-line w60"></div>
+                <div class="tp-line w90"></div>
+              </div>
+            </div>
+            <div class="template-info">
+              <h4>Creative Bold</h4>
+              <span class="template-ats">ATS Score: 82/100</span>
+              <button class="btn btn-primary btn-sm" onclick="CVExpert.useTemplate('creative')">Use Template</button>
+            </div>
+          </div>
+          <div class="template-card glass-card" data-template="minimal">
+            <div class="template-preview minimal-preview">
+              <div class="tp-body clean">
+                <div class="tp-line w70"></div>
+                <div class="tp-line w50"></div>
+                <div class="tp-line w80"></div>
+                <div class="tp-line w60"></div>
+              </div>
+            </div>
+            <div class="template-info">
+              <h4>Minimal Clean</h4>
+              <span class="template-ats">ATS Score: 97/100</span>
+              <button class="btn btn-primary btn-sm" onclick="CVExpert.useTemplate('minimal')">Use Template</button>
+            </div>
+          </div>
+          <div class="template-card glass-card" data-template="executive">
+            <div class="template-preview executive-preview">
+              <div class="tp-header dark"></div>
+              <div class="tp-body">
+                <div class="tp-line w90"></div>
+                <div class="tp-line w75"></div>
+                <div class="tp-line w85"></div>
+              </div>
+            </div>
+            <div class="template-info">
+              <h4>Executive Premium</h4>
+              <span class="template-ats">ATS Score: 93/100</span>
+              <button class="btn btn-primary btn-sm" onclick="CVExpert.useTemplate('executive')">Use Template</button>
+            </div>
+          </div>
+          <div class="template-card glass-card" data-template="tech">
+            <div class="template-preview tech-preview">
+              <div class="tp-header accent"></div>
+              <div class="tp-body grid">
+                <div class="tp-line w60"></div>
+                <div class="tp-line w80"></div>
+                <div class="tp-line w50"></div>
+                <div class="tp-line w70"></div>
+              </div>
+            </div>
+            <div class="template-info">
+              <h4>Tech Specialist</h4>
+              <span class="template-ats">ATS Score: 91/100</span>
+              <button class="btn btn-primary btn-sm" onclick="CVExpert.useTemplate('tech')">Use Template</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: HISTORY ===== -->
+      <section id="view-history" class="view fade-in">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title"><i class="fas fa-history"></i> Analysis <span class="gradient-text">History</span></h1>
+            <p class="view-subtitle">Track your CV improvements over time</p>
+          </div>
+        </div>
+        <div class="history-timeline" id="historyTimeline">
+          <p class="empty-state"><i class="fas fa-folder-open"></i><br>No analysis history yet. Start by analyzing a CV!</p>
+        </div>
+      </section>
+
+      <!-- ===== VIEW: SETTINGS ===== -->
+      <section id="view-settings" class="view fade-in">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title"><i class="fas fa-cog"></i> <span class="gradient-text">Settings</span></h1>
+            <p class="view-subtitle">Customize your CV Expert experience</p>
+          </div>
+        </div>
+        <div class="settings-grid">
+          <div class="glass-card">
+            <h3><i class="fas fa-palette"></i> Appearance</h3>
+            <div class="setting-item">
+              <label>Theme</label>
+              <select id="themeSelect" class="form-input" onchange="CVExpert.setTheme(this.value)">
+                <option value="dark">Dark Mode</option>
+                <option value="light">Light Mode</option>
+                <option value="midnight">Midnight Blue</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>Accent Color</label>
+              <div class="color-options" id="accentColors">
+                <button class="color-dot active" style="--dot-color: #00d4ff" onclick="CVExpert.setAccent('#00d4ff')"></button>
+                <button class="color-dot" style="--dot-color: #00ff88" onclick="CVExpert.setAccent('#00ff88')"></button>
+                <button class="color-dot" style="--dot-color: #ff6b35" onclick="CVExpert.setAccent('#ff6b35')"></button>
+                <button class="color-dot" style="--dot-color: #a855f7" onclick="CVExpert.setAccent('#a855f7')"></button>
+                <button class="color-dot" style="--dot-color: #f43f5e" onclick="CVExpert.setAccent('#f43f5e')"></button>
+                <button class="color-dot" style="--dot-color: #eab308" onclick="CVExpert.setAccent('#eab308')"></button>
+              </div>
+            </div>
+            <div class="setting-item">
+              <label>Animations</label>
+              <label class="toggle-switch">
+                <input type="checkbox" id="animationsToggle" checked onchange="CVExpert.toggleAnimations()">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="glass-card">
+            <h3><i class="fas fa-brain"></i> AI Settings</h3>
+            <div class="setting-item">
+              <label>Analysis Depth</label>
+              <select id="analysisDepth" class="form-input">
+                <option value="quick">Quick Scan</option>
+                <option value="standard" selected>Standard Analysis</option>
+                <option value="deep">Deep Analysis</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>Default Industry</label>
+              <select id="defaultIndustry" class="form-input">
+                <option value="general">General</option>
+                <option value="tech">Technology</option>
+                <option value="gis">GIS & Geospatial</option>
+                <option value="energy">Energy</option>
+                <option value="finance">Finance</option>
+              </select>
+            </div>
+          </div>
+          <div class="glass-card">
+            <h3><i class="fas fa-database"></i> Data</h3>
+            <div class="setting-item">
+              <button class="btn btn-secondary" onclick="CVExpert.exportAllData()">
+                <i class="fas fa-download"></i> Export All Data
+              </button>
+            </div>
+            <div class="setting-item">
+              <button class="btn btn-danger" onclick="CVExpert.clearHistory()">
+                <i class="fas fa-trash"></i> Clear History
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===== AI CHAT WIDGET ===== -->
+  <div id="aiChatWidget" class="ai-chat-widget hidden">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar pulse-glow"><i class="fas fa-robot"></i></div>
+        <div>
+          <h4>CV Expert AI</h4>
+          <span class="online-status"><span class="pulse-dot green"></span> Online</span>
+        </div>
+      </div>
+      <div class="chat-controls">
+        <button class="chat-control-btn" onclick="CVExpert.clearChat()"><i class="fas fa-eraser"></i></button>
+        <button class="chat-control-btn" onclick="CVExpert.toggleChat()"><i class="fas fa-minus"></i></button>
+      </div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-message ai">
+        <div class="message-avatar"><i class="fas fa-robot"></i></div>
+        <div class="message-bubble">
+          <p>Hello! I'm your AI CV assistant. I can help you with:</p>
+          <ul>
+            <li>Analyzing your CV for ATS compatibility</li>
+            <li>Suggesting improvements and keywords</li>
+            <li>Answering career-related questions</li>
+            <li>Interview preparation tips</li>
+          </ul>
+          <p>How can I help you today?</p>
+        </div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-suggestions">
+        <button onclick="CVExpert.sendQuickChat('How can I improve my ATS score?')">Improve ATS Score</button>
+        <button onclick="CVExpert.sendQuickChat('What keywords should I add?')">Keyword Tips</button>
+        <button onclick="CVExpert.sendQuickChat('Review my CV')">Review CV</button>
+      </div>
+      <div class="chat-input-container">
+        <input type="text" id="chatInput" placeholder="Ask me anything about your CV..." onkeypress="if(event.key==='Enter')CVExpert.sendChat()">
+        <button class="chat-send-btn" onclick="CVExpert.sendChat()">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FLOATING AI BUTTON (when chat is closed) ===== -->
+  <button id="aiFloatingBtn" class="ai-floating-btn glow-btn" onclick="CVExpert.toggleChat()">
+    <i class="fas fa-robot"></i>
+    <span class="floating-badge">AI</span>
+  </button>
+
+  <!-- ===== TOAST NOTIFICATIONS ===== -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- ===== MODAL OVERLAY ===== -->
+  <div id="modalOverlay" class="modal-overlay hidden">
+    <div class="modal-content glass-card" id="modalContent"></div>
+  </div>
+
+  <!-- ===== COMMAND PALETTE ===== -->
+  <div id="commandPalette" class="command-palette hidden">
+    <div class="command-search">
+      <i class="fas fa-search"></i>
+      <input type="text" id="commandInput" placeholder="Type a command..." autocomplete="off">
+    </div>
+    <div class="command-list" id="commandList">
+      <div class="command-item" data-action="analyzer"><i class="fas fa-search-plus"></i> Analyze CV</div>
+      <div class="command-item" data-action="builder"><i class="fas fa-magic"></i> Build New CV</div>
+      <div class="command-item" data-action="optimizer"><i class="fas fa-bolt"></i> Optimize CV</div>
+      <div class="command-item" data-action="job-match"><i class="fas fa-crosshairs"></i> Job Match</div>
+      <div class="command-item" data-action="keywords"><i class="fas fa-key"></i> Keywords</div>
+      <div class="command-item" data-action="interview"><i class="fas fa-microphone"></i> Interview Prep</div>
+      <div class="command-item" data-action="templates"><i class="fas fa-layer-group"></i> Templates</div>
+      <div class="command-item" data-action="settings"><i class="fas fa-cog"></i> Settings</div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/ai-engine.js"></script>
+  <script src="js/cv-parser.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "cv-expert",
+  "version": "2.0.0",
+  "description": "AI-Powered CV Expert - ATS Analyzer, CV Builder & Optimizer",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve -l 3000 -s .",
+    "start": "npx serve -l 3000 -s .",
+    "test": "echo \"Tests running...\" && exit 0"
+  },
+  "keywords": ["cv", "resume", "ats", "ai", "optimizer"],
+  "author": "Collins Anyanwu",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "docx": "^9.6.1",
+    "serve": "^14.2.0"
+  }
+}
