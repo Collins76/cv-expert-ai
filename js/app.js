@@ -387,6 +387,13 @@ const CVExpert = (() => {
       return;
     }
 
+    const ext = file.name.split('.').pop().toLowerCase();
+    const allowedExts = ['pdf', 'docx', 'doc', 'txt'];
+    if (!allowedExts.includes(ext)) {
+      showToast(`Unsupported format ".${ext}". Use PDF, DOCX, or TXT.`, 'error');
+      return;
+    }
+
     const progressSection = document.getElementById('uploadProgress');
     const progressBar = document.getElementById('uploadProgressBar');
     const fileName = document.getElementById('uploadFileName');
@@ -400,14 +407,16 @@ const CVExpert = (() => {
     // Animate progress
     let progress = 0;
     const interval = setInterval(() => {
-      progress += Math.random() * 20 + 10;
-      if (progress >= 90) {
+      progress += Math.random() * 15 + 5;
+      if (progress >= 80) {
         clearInterval(interval);
-        progress = 90;
+        progress = 80;
       }
       progressBar.style.width = progress + '%';
       percent.textContent = Math.round(progress) + '%';
-    }, 150);
+    }, 120);
+
+    showToast(`Reading ${ext.toUpperCase()} file...`, 'info');
 
     try {
       const text = await CVParser.readFile(file);
@@ -415,17 +424,23 @@ const CVExpert = (() => {
       progressBar.style.width = '100%';
       percent.textContent = '100%';
 
-      if (text && text.length > 50) {
+      if (text && text.trim().length > 30) {
         document.getElementById('cvTextInput').value = text;
         state.cvText = text;
-        showToast('File uploaded successfully!', 'success');
-        setTimeout(() => analyzeCV(), 500);
+        showToast(`${ext.toUpperCase()} parsed successfully! ${text.split(/\s+/).length} words extracted.`, 'success');
+        setTimeout(() => analyzeCV(), 800);
       } else {
-        showToast('Could not extract text. Please paste your CV content manually.', 'warning');
+        progressBar.style.background = 'var(--warning)';
+        showToast('Very little text was extracted. The file may be image-based. Try pasting text manually.', 'warning');
       }
     } catch (err) {
       clearInterval(interval);
-      showToast('Error reading file. Please paste content manually.', 'error');
+      progressBar.style.width = '100%';
+      progressBar.style.background = 'var(--danger)';
+      percent.textContent = 'Error';
+      const errorMsg = err.message || 'Unknown error reading file.';
+      showToast(errorMsg, 'error');
+      console.error('File parse error:', err);
     }
   }
 

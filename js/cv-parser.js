@@ -9,88 +9,178 @@ const CVParser = (() => {
   // FILE READER
   // ==========================================
   async function readFile(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      const ext = file.name.split('.').pop().toLowerCase();
+    const ext = file.name.split('.').pop().toLowerCase();
 
-      if (ext === 'txt') {
+    if (ext === 'txt') {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
         reader.onload = (e) => resolve(e.target.result);
         reader.onerror = reject;
         reader.readAsText(file);
-      } else if (ext === 'pdf') {
-        // For PDF, we'll extract text as best we can
-        reader.onload = async (e) => {
-          try {
-            const text = await extractPDFText(e.target.result);
-            resolve(text);
-          } catch {
-            resolve('[PDF parsing requires server-side processing. Please paste the text content instead.]');
-          }
-        };
-        reader.onerror = reject;
-        reader.readAsArrayBuffer(file);
-      } else if (ext === 'docx' || ext === 'doc') {
-        reader.onload = async (e) => {
-          try {
-            const text = await extractDocxText(e.target.result);
-            resolve(text);
-          } catch {
-            resolve('[DOCX parsing requires additional libraries. Please paste the text content instead.]');
-          }
-        };
-        reader.onerror = reject;
-        reader.readAsArrayBuffer(file);
-      } else {
-        reject(new Error('Unsupported file format'));
-      }
-    });
-  }
-
-  // Simple PDF text extraction (basic)
-  async function extractPDFText(arrayBuffer) {
-    const uint8Array = new Uint8Array(arrayBuffer);
-    let text = '';
-
-    // Basic text extraction from PDF streams
-    const decoder = new TextDecoder('utf-8', { fatal: false });
-    const content = decoder.decode(uint8Array);
-
-    // Extract text between BT and ET markers
-    const textBlocks = content.match(/BT[\s\S]*?ET/g) || [];
-    textBlocks.forEach(block => {
-      const textItems = block.match(/\((.*?)\)/g) || [];
-      textItems.forEach(item => {
-        text += item.slice(1, -1) + ' ';
       });
-      text += '\n';
-    });
-
-    if (text.trim().length < 50) {
-      return 'PDF text extraction is limited in the browser. For best results, please copy and paste your CV text directly into the text area.';
     }
 
-    return text.trim();
+    if (ext === 'pdf') {
+      const arrayBuffer = await file.arrayBuffer();
+      return extractPDFText(arrayBuffer);
+    }
+
+    if (ext === 'docx' || ext === 'doc') {
+      const arrayBuffer = await file.arrayBuffer();
+      return extractDocxText(arrayBuffer);
+    }
+
+    throw new Error('Unsupported file format. Please use PDF, DOCX, or TXT.');
   }
 
-  // Simple DOCX text extraction
-  async function extractDocxText(arrayBuffer) {
-    // DOCX is a ZIP file containing XML
-    // We'll attempt basic extraction
+  // ==========================================
+  // PDF TEXT EXTRACTION (using PDF.js)
+  // ==========================================
+  async function extractPDFText(arrayBuffer) {
+    // Check if PDF.js is available
+    if (typeof pdfjsLib === 'undefined') {
+      throw new Error('PDF.js library not loaded. Please refresh the page and try again.');
+    }
+
+    // Set the worker source for PDF.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
     try {
-      const uint8Array = new Uint8Array(arrayBuffer);
-      const decoder = new TextDecoder('utf-8', { fatal: false });
-      const content = decoder.decode(uint8Array);
+      const typedArray = new Uint8Array(arrayBuffer);
+      const pdf = await pdfjsLib.getDocument({ data: typedArray }).promise;
+      const totalPages = pdf.numPages;
+      const textParts = [];
 
-      // Extract text from XML tags
-      let text = content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
 
-      if (text.length < 50) {
-        return 'DOCX text extraction is limited in the browser. For best results, please copy and paste your CV text directly.';
+        // Build text from items, preserving line breaks
+        let lastY = null;
+        let lineText = '';
+
+        textContent.items.forEach(item => {
+          const currentY = Math.round(item.transform[5]);
+
+          if (lastY !== null && Math.abs(currentY - lastY) > 5) {
+            // New line detected (Y position changed significantly)
+            textParts.push(lineText.trim());
+            lineText = '';
+          }
+
+          // Add space between items on same line if there's a gap
+          if (lineText && !lineText.endsWith(' ') && !item.str.startsWith(' ')) {
+            const prevEnd = lineText.length > 0;
+            if (prevEnd && item.str.length > 0) {
+              lineText += ' ';
+            }
+          }
+
+          lineText += item.str;
+          lastY = currentY;
+        });
+
+        // Push last line
+        if (lineText.trim()) {
+          textParts.push(lineText.trim());
+        }
+
+        // Add page separator for multi-page docs
+        if (pageNum < totalPages) {
+          textParts.push('');
+        }
       }
 
-      return text;
-    } catch {
-      return 'Please paste your CV text directly for analysis.';
+      const fullText = textParts
+        .join('\n')
+        .replace(/\n{3,}/g, '\n\n')  // Remove excessive blank lines
+        .trim();
+
+      if (fullText.length < 20) {
+        throw new Error('Could not extract readable text from this PDF. It may be image-based or scanned.');
+      }
+
+      return fullText;
+    } catch (error) {
+      if (error.message && error.message.includes('Could not extract')) {
+        throw error;
+      }
+      throw new Error(
+        'Failed to parse this PDF file. The file may be corrupted, password-protected, or image-based. ' +
+        'Please try copying and pasting the text content directly.'
+      );
+    }
+  }
+
+  // ==========================================
+  // DOCX TEXT EXTRACTION (using JSZip)
+  // ==========================================
+  async function extractDocxText(arrayBuffer) {
+    // Check if JSZip is available
+    if (typeof JSZip === 'undefined') {
+      throw new Error('JSZip library not loaded. Please refresh the page and try again.');
+    }
+
+    try {
+      const zip = await JSZip.loadAsync(arrayBuffer);
+
+      // DOCX stores content in word/document.xml
+      const documentXml = zip.file('word/document.xml');
+      if (!documentXml) {
+        throw new Error('Invalid DOCX file: missing document.xml');
+      }
+
+      const xmlContent = await documentXml.async('string');
+
+      // Parse the XML to extract text
+      const textParts = [];
+
+      // Split by paragraph tags <w:p>
+      const paragraphs = xmlContent.split(/<w:p[\s>]/);
+
+      paragraphs.forEach(para => {
+        // Extract text from <w:t> tags within each paragraph
+        const textMatches = para.match(/<w:t[^>]*>([^<]*)<\/w:t>/g);
+        if (textMatches) {
+          const lineText = textMatches
+            .map(match => {
+              const content = match.replace(/<w:t[^>]*>/, '').replace(/<\/w:t>/, '');
+              return content;
+            })
+            .join('');
+
+          if (lineText.trim()) {
+            textParts.push(lineText.trim());
+          }
+        } else {
+          // Empty paragraph = line break
+          if (textParts.length > 0 && textParts[textParts.length - 1] !== '') {
+            textParts.push('');
+          }
+        }
+      });
+
+      const fullText = textParts
+        .join('\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+
+      if (fullText.length < 20) {
+        throw new Error('Could not extract readable text from this DOCX file.');
+      }
+
+      return fullText;
+    } catch (error) {
+      if (error.message && error.message.includes('Could not extract')) {
+        throw error;
+      }
+      if (error.message && error.message.includes('Invalid DOCX')) {
+        throw error;
+      }
+      throw new Error(
+        'Failed to parse this DOCX file. Please try copying and pasting the text content directly.'
+      );
     }
   }
 
